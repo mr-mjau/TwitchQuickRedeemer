@@ -30,14 +30,16 @@ The developer is not responsible for any bans that may occur.
 
 ## 🔧 Setup
 
-1. **Install dependencies:**
+1. **Install python (if needed)**
+
+2. **Install dependencies:**
     ```bash
     pip install requests
     ```
 
-2. **Configure credentials:**
+3. **Configure credentials:**
 
    Rename "config.example.ini" to "config.ini" and fill in the required information.
+   (A guide for gathering the required information is available within the .ini file) 
 
-3. **Run the script**
-   
+5. **Run the script, following instructions**
