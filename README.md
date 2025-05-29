@@ -4,14 +4,14 @@ Redeem Twitch Channelpoint-rewards programmatically using API calls.
 
 ---
 
-## Disclaimer
+## ⚠️ Disclaimer
 
 This script makes authenticated calls to Twitch’s API. Abuse may lead to account bans.
 The developer is not responsible for any bans that may occur.
 
 ---
 
-## Features
+## 🚀 Features
 
 - Automatically fetches Twitch channel point rewards
 - Filters and lists rewards based on cooldown
@@ -21,14 +21,14 @@ The developer is not responsible for any bans that may occur.
 
 ---
 
-## Requirements
+## 🧾 Requirements
 
 - Python 3.8+
 - A valid Twitch OAuth token, Client ID, and Session ID
 
 ---
 
-## Setup
+## 🔧 Setup
 
 1. **Install dependencies:**
     ```bash
