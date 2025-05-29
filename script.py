@@ -2,24 +2,15 @@ import requests
 import json
 import time
 import sys
-import uuid
 import random
-import math
 import os
-import heapq
-import subprocess
 import concurrent.futures
 import configparser
 from os import system
-from collections import Counter
 
 name = "Twitch Quick-redeemer"
 system("title " + f"{name}")
 version = 0.8
-
-config = configparser.ConfigParser()
-config.read("config.ini")
-
 
 # ANSI color codes for formatting output
 blue = "\033[94m"
@@ -28,7 +19,26 @@ yellow = "\033[93m"
 red = "\033[91m"
 white = "\033[0m"
 
-# Replace these with values from your browser's Network tab
+def verify_config():
+    required_section = "User_data"
+    required_keys = ["Authorization", "Client_ID", "Client_session_ID"]
+
+    if not config.has_section(required_section):
+        print(f"\n❌ Configuration error: Missing section {yellow}{required_section}{white} in config.ini.")
+        input("Press Enter to exit...")
+        sys.exit()
+
+    missing_keys = [key for key in required_keys if not config.has_option(required_section, key)]
+    if missing_keys:
+        print(f"\n❌ Configuration error: Missing keys in {yellow}{required_section}{white}: {', '.join(missing_keys)}")
+        input("Press Enter to exit...")
+        sys.exit()
+
+
+config = configparser.ConfigParser()
+config.read("config.ini")
+verify_config()
+
 OAUTH_TOKEN = config.get("User_data", "Authorization")
 CLIENT_ID = config.get("User_data", "Client_ID")
 CLIENT_SESSION_ID = config.get("User_data", "Client_session_ID")
@@ -47,6 +57,7 @@ HEADERS = {
     "Referer": REFERER_BASE,
     "Content-Type": "application/json"
 }
+
 
 def clear_console():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -306,8 +317,9 @@ def main():
 
     except KeyError as e:
         print(f"❌ Error fetching rewards: {e}")
-        print("⚠️ Twitch may have changed the API structure or the request is missing authentication.")
-        restart_script()
+        print("⚠️ Twitch may have changed the API structure or your provided credentials are invalid/incorrect (config.ini)")
+        input("\nPress Enter to close the script...")
+        exit()
 
     if len(rewards_sorted) == 0:
         input("\nPress enter to reset ")
