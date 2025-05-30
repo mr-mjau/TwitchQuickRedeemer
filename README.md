@@ -16,7 +16,6 @@ The developer is not responsible for any bans that may occur.
 - Automatically fetches Twitch channel point rewards
 - Filters and lists rewards based on cooldown
 - Redeems multiple rewards concurrently or with acceleration
-- Built-in warnings for Twitch rate limits
 - Interactive CLI
 
 ---
@@ -30,7 +29,7 @@ The developer is not responsible for any bans that may occur.
 
 ## 🔧 Setup
 
-1. **Install python (if needed)**
+1. **Install python**
 
 2. **Install dependencies:**
     ```bash
