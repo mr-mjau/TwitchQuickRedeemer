@@ -1,6 +1,7 @@
 # TwitchQuickRedeemer
 
 Redeem Twitch Channelpoint-rewards programmatically using API calls.
+(Enables you to redeem rewards very rapidly - down to 40ms intervals)
 
 ---
 
