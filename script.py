@@ -284,10 +284,14 @@ def main():
             if onlyNoCooldown in ["yes", "y", "1"] and reward["globalCooldownSetting"]["isEnabled"]:
                 continue  # Skip non-zero cooldowns if filtered
 
+            limit_flag = ""
+            if reward["maxPerStreamSetting"]["isEnabled"] or reward["maxPerUserPerStreamSetting"]["isEnabled"]:
+                limit_flag = f"⚠️ "  # Add red exclamation mark
+
             if is_input_required:
-                print(f"{index}. {blue}{title}{white} | {green}Cost: {f_cost}{white} | {yellow}Cooldown: {cooldown}s{white} | {red}You can afford: {f_max_affordable}x{white} | Requires user input")
+                print(f"{index}. {limit_flag}{blue}{title}{white} | {green}Cost: {f_cost}{white} | {yellow}Cooldown: {cooldown}s{white} | {red}You can afford: {f_max_affordable}x{white} | Requires user input")
             else:
-                print(f"{index}. {blue}{title}{white} | {green}Cost: {f_cost}{white} | {yellow}Cooldown: {cooldown}s{white} | {red}You can afford: {f_max_affordable}x{white}")
+                print(f"{index}. {limit_flag}{blue}{title}{white} | {green}Cost: {f_cost}{white} | {yellow}Cooldown: {cooldown}s{white} | {red}You can afford: {f_max_affordable}x{white}")
 
             reward_dict[index] = {
                 "id": reward["id"],
@@ -338,6 +342,21 @@ def main():
                 break
             elif chosen_number in reward_dict:
                 selected_reward = reward_dict[chosen_number]
+
+                reward_full = rewards_sorted[chosen_number - 1]  # Full reward data
+                max_per_stream_enabled = reward_full["maxPerStreamSetting"]["isEnabled"]
+                max_per_stream = reward_full["maxPerStreamSetting"]["maxPerStream"]
+                max_per_user_enabled = reward_full["maxPerUserPerStreamSetting"]["isEnabled"]
+                max_per_user = reward_full["maxPerUserPerStreamSetting"]["maxPerUserPerStream"]
+
+                if max_per_stream_enabled or max_per_user_enabled:
+                    print(f"{yellow}⚠️ This redeem has usage limits:{white}")
+                    if max_per_stream_enabled:
+                        print(f"  - {red}Max per stream: {max_per_stream}{white}")
+                    if max_per_user_enabled:
+                        print(f"  - {red}Max per user per stream: {max_per_user}{white}")
+
+
                 reward_id = selected_reward["id"]
                 reward_title = selected_reward["title"]
                 reward_cost = selected_reward["cost"]
@@ -354,7 +373,7 @@ def main():
                     try:
                         num_redeems = int(input(f"🧮 How many times to redeem '{reward_title}'? (Max: {max_affordable}): "))
                         if num_redeems == 0:
-                            print("❌ Cannot redeem 0 times. Try again.")
+                            restart_script()
                         elif num_redeems > max_affordable:
                             print(f"❌ Enter a number from 1 to {max_affordable}.")
                         else:
@@ -412,7 +431,9 @@ def main():
         while True:
             try:
                 start_delay = int(input("\n⌛ Starting delay between redeems (ms): "))
-                if start_delay < 1000:
+                if start_delay == 0:
+                    restart_script()
+                elif start_delay < 1000:
                     print("❌ Start delay must be at least 1s.")
                 else:
                     break
@@ -432,7 +453,9 @@ def main():
         while True:
             try:
                 delay_ms = int(input("⌛ Delay between redeems (ms): "))
-                if delay_ms < 40:
+                if delay_ms == 0:
+                    restart_script()
+                elif delay_ms < 40:
                     print("❌ Twitch cannot keep up with too small of a delay. Minimum delay 40ms.")
                 else:
                     break
@@ -472,9 +495,15 @@ def main():
     print(f"- {green}Cost {total_cost}{white} | Remaining {green}{balance - total_cost}{white}")
 
     confirmation = input("Please Confirm [yes/no/test]: ").strip().lower()
+    showHeaders = False
 
     if confirmation in ["test", "debug", "simulate"]:
         debug = True
+
+        showHeaders_input = input("Print request headers (Sensitive data) [yes/no]: ").strip().lower()
+        if showHeaders_input in ["y", "yes", "1"]:
+            showHeaders = True
+            
     elif confirmation not in ["yes", "y", "1"]:
         print("❌ Operation canceled.")
         restart_script()
@@ -495,6 +524,12 @@ def main():
     random.shuffle(redemption_list)  # Mixed redeem order
 
     print("\nStarting mixed redeems...")
+
+    if debug and showHeaders:
+        print(f"{yellow}[DEBUG]{white} Request headers being used:")
+        print(json.dumps(HEADERS, indent=4))
+        print(f"\n")
+
     if accel_mode:
         redeem_all_accelerating(redemption_list, start_delay, accel_percent, debug)
     else:
